@@ -31,11 +31,17 @@ const PASTEL_COLORS = [
 
 export function TimeGrid({
   days = ["Mon", "Tue", "Wed", "Thu", "Fri"],
-  startHour = 1,
-  endHour = 24,
+  startHour = 5,
+  endHour = 23,
 }: TimeGridProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+
+  const [modalInitialState, setModalInitialState] = useState<{
+    day: string;
+    startTime: string;
+    endTime: string;
+  } | null>(null);
 
   // Create an array of hours based on start/end props
   const hours = useMemo(() => {
@@ -63,6 +69,39 @@ export function TimeGrid({
     setEvents((prev) => [...prev, newEvent]);
   };
 
+  const handleCellClick = (day: string, hour: number) => {
+    if (hour === 24) {
+      // Midnight slot: default to 12:00 AM - 12:00 AM (0 mins)
+      // or 24:00 - 24:00. 
+      // Our validation requires end > start, so user will have to edit it.
+      setModalInitialState({
+        day,
+        startTime: "24:00",
+        endTime: "24:00"
+      });
+      setIsModalOpen(true);
+      return;
+    }
+
+    // Format hour to HH:00
+    const startH = hour < 10 ? `0${hour}` : `${hour}`;
+    const startTime = `${startH}:00`;
+    
+    // Default 1 hour duration
+    let endH = hour + 1;
+    // Cap at 24?
+    if (endH > 24) endH = 24; 
+    const endHStr = endH < 10 ? `0${endH}` : `${endH}`;
+    const endTime = `${endHStr}:00`;
+
+    setModalInitialState({
+        day,
+        startTime,
+        endTime
+    });
+    setIsModalOpen(true);
+  };
+
   return (
     <div className={styling.container}>
       {/* Modal Layer */}
@@ -71,12 +110,18 @@ export function TimeGrid({
         onClose={() => setIsModalOpen(false)} 
         onSave={handleSaveEvent}
         days={days}
+        initialDay={modalInitialState?.day}
+        initialStartTime={modalInitialState?.startTime}
+        initialEndTime={modalInitialState?.endTime}
       />
 
       <div className={styling.grid} style={gridStyle}>
         {/* Render Header Row */}
         <div className={styling.cornerCell}>
-           <AddEventButton onClick={() => setIsModalOpen(true)} />
+           <AddEventButton onClick={() => {
+               setModalInitialState(null); // Reset to defaults for generic add
+               setIsModalOpen(true);
+           }} />
         </div>
         {days.map((day) => (
           <div key={day} className={styling.headerCell}>
@@ -102,6 +147,7 @@ export function TimeGrid({
                 <div
                   key={`${day}-${hour}`}
                   className={styling.cell}
+                  onClick={() => handleCellClick(day, hour)}
                 >
                   {cellEvents.map(event => {
                      const [startH, startM] = event.startTime.split(":").map(Number);
@@ -124,7 +170,10 @@ export function TimeGrid({
                          height={`${heightPercent}%`}
                          color={event.color}
                          time={formatHour(startH) + " - " + formatHour(endH)}
-                         onClick={() => console.log("Clicked event", event)}
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           console.log("Clicked event", event);
+                         }}
                        />
                      );
                   })}
