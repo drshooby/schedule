@@ -8,7 +8,7 @@ interface EventCardProps {
   height: string; // percentage
   color: string;
   time: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 export function EventCard({ 
@@ -29,7 +29,7 @@ export function EventCard({
       }}
       onClick={(e) => {
         e.stopPropagation();
-        onClick?.();
+        onClick?.(e);
       }}
       title={title}
     >
