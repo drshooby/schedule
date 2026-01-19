@@ -1,0 +1,79 @@
+/* Toast.module.css */
+.toast {
+  position: fixed;
+  top: 32px;
+  /* Lower it slightly */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #111;
+  /* Slightly softer black */
+  color: #fff;
+  padding: 16px 32px;
+  padding-bottom: 20px;
+  /* Space for bar */
+  border-radius: 12px;
+  /* Less rounded to accommodate bar nicely, or keep pill? Let's do rounded rect */
+  font-size: 1.1rem;
+  /* Larger text */
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  min-width: 300px;
+  max-width: 90vw;
+  text-align: center;
+  overflow: hidden;
+  /* Mask the progress bar */
+
+  animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.3s ease-in 3.7s forwards;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.progressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.792);
+  width: 100%;
+  transform-origin: left;
+  animation: progress 4s linear forwards;
+}
+
+@keyframes progress {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
