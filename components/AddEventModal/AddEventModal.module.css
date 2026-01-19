@@ -1,5 +1,4 @@
-/* AddEventModal.module.css */
-
+/* AddEventModal.module.css additions */
 .overlay {
   position: fixed;
   top: 0;
@@ -8,122 +7,137 @@
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 1000;
-  /* Ensure it sits on top of everything */
-  animation: fadeIn 0.2s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal {
-  background-color: white;
+  background: white;
   padding: 32px;
   border-radius: 16px;
-  width: 400px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  font-family: var(--font-geist-sans), sans-serif;
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  transform: scale(1);
+  animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .title {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   color: #111;
 }
 
-.formGroup {
-  margin-bottom: 20px;
+.form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 28px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .label {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  color: #555;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .input,
 .select {
-  padding: 10px 12px;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  border: 1px solid #E5E5E5;
   font-size: 1rem;
-  font-family: inherit;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fcfcfc;
 }
 
 .input:focus,
 .select:focus {
   outline: none;
   border-color: #000;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  background: #fff;
 }
 
 .row {
   display: flex;
-  gap: 16px;
+  gap: 20px;
 }
 
 .actions {
   display: flex;
-  justify-content: flex-end;
   gap: 12px;
   margin-top: 32px;
+  justify-content: flex-end;
+  /* If remove button is present, justify-content might need to be 'space-between' or handled via margin-right: auto on the button */
 }
 
 .button {
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 500;
+  font-size: 0.95rem;
   cursor: pointer;
-  font-size: 0.9rem;
+  transition: all 0.2s ease;
   border: none;
-  transition: all 0.15s ease;
 }
 
 .cancelBtn {
-  background-color: transparent;
-  color: #666;
-}
-
-.cancelBtn:hover {
-  background-color: #F5F5F5;
+  background: #f0f0f0;
   color: #333;
 }
 
+.cancelBtn:hover {
+  background: #e0e0e0;
+}
+
 .submitBtn {
-  background-color: #000;
+  background: #000;
   color: #fff;
 }
 
 .submitBtn:hover {
-  background-color: #333;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+.removeBtn {
+  margin-right: auto;
+  background-color: transparent;
+  color: #ff4444;
+  border: 1px solid #ff4444;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.removeBtn:hover {
+  background-color: #ff4444;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 68, 68, 0.2);
 }
