@@ -1,0 +1,24 @@
+.addButton {
+  width: auto;
+  height: auto;
+  border: none;
+  background: none;
+  border-radius: 0;
+  color: #555;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s ease, color 0.2s ease;
+  padding: 0;
+}
+
+.addButton:hover {
+  background-color: transparent;
+  border-color: transparent;
+  color: #000;
+  transform: rotate(180deg) scale(1.1);
+  box-shadow: none;
+}
