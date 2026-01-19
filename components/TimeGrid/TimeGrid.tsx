@@ -1,9 +1,11 @@
 "use client";
 import React, { useMemo, useState } from "react";
 import styling from "./TimeGrid.module.css";
-import { AddEventModal } from "../AddEventModal/AddEventModal";
-import { AddEventButton } from "../AddEventButton";
-import { EventCard } from "../EventCard";
+import { AddEventModal } from "@/components/AddEventModal/AddEventModal";
+import { AddEventButton } from "@/components/AddEventButton";
+import { EventCard } from "@/components/EventCard";
+import { Toast } from "@/components/Toast";
+import { START_HOUR, END_HOUR } from "@/utils/constants";
 
 interface TimeGridProps {
   days?: string[];
@@ -29,10 +31,20 @@ const PASTEL_COLORS = [
   "#FAFAFA", // Gray
 ];
 
+
+
+interface TimeGridProps {
+  days?: string[];
+  startHour?: number;
+  endHour?: number;
+}
+
+// ... (CalendarEvent interface remains same)
+
 export function TimeGrid({
   days = ["Mon", "Tue", "Wed", "Thu", "Fri"],
-  startHour = 5,
-  endHour = 23,
+  startHour = START_HOUR,
+  endHour = END_HOUR,
 }: TimeGridProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -42,6 +54,9 @@ export function TimeGrid({
     startTime: string;
     endTime: string;
   } | null>(null);
+
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [toast, setToast] = useState<{ message: string; type?: "success" | "error"; duration?: number } | null>(null);
 
   // Create an array of hours based on start/end props
   const hours = useMemo(() => {
@@ -58,15 +73,34 @@ export function TimeGrid({
   } as React.CSSProperties;
 
   const handleSaveEvent = (newEventData: any) => {
-    const newEvent: CalendarEvent = {
-        id: crypto.randomUUID(),
-        title: newEventData.title,
-        day: newEventData.day,
-        startTime: newEventData.startTime,
-        endTime: newEventData.endTime,
-        color: PASTEL_COLORS[Math.floor(Math.random() * PASTEL_COLORS.length)],
-    };
-    setEvents((prev) => [...prev, newEvent]);
+    if (selectedEvent) {
+        // Editing existing event
+        setEvents(prev => prev.map(e => e.id === selectedEvent.id ? {
+            ...e,
+            ...newEventData
+            // Keep original color
+        } : e));
+        setSelectedEvent(null);
+    } else {
+        // Creating new event
+        const newEvent: CalendarEvent = {
+            id: crypto.randomUUID(),
+            title: newEventData.title,
+            day: newEventData.day,
+            startTime: newEventData.startTime,
+            endTime: newEventData.endTime,
+            color: PASTEL_COLORS[Math.floor(Math.random() * PASTEL_COLORS.length)],
+        };
+        setEvents((prev) => [...prev, newEvent]);
+    }
+  };
+
+  const handleDeleteEvent = () => {
+      if (selectedEvent) {
+          setEvents(prev => prev.filter(e => e.id !== selectedEvent.id));
+          setToast({ message: "Event removed.", type: "success", duration: 2500 });
+          setSelectedEvent(null);
+      }
   };
 
   const handleCellClick = (day: string, hour: number) => {
@@ -107,19 +141,34 @@ export function TimeGrid({
       {/* Modal Layer */}
       <AddEventModal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+        onClose={() => {
+            setIsModalOpen(false);
+            setSelectedEvent(null);
+        }} 
         onSave={handleSaveEvent}
+        onDelete={selectedEvent ? handleDeleteEvent : undefined}
         days={days}
-        initialDay={modalInitialState?.day}
-        initialStartTime={modalInitialState?.startTime}
-        initialEndTime={modalInitialState?.endTime}
+        initialDay={selectedEvent ? selectedEvent.day : modalInitialState?.day}
+        initialStartTime={selectedEvent ? selectedEvent.startTime : modalInitialState?.startTime}
+        initialEndTime={selectedEvent ? selectedEvent.endTime : modalInitialState?.endTime}
+        initialTitle={selectedEvent ? selectedEvent.title : ""}
       />
+      
+      {toast && (
+          <Toast 
+            message={toast.message} 
+            type={toast.type} 
+            duration={toast.duration} 
+            onClose={() => setToast(null)} 
+          />
+      )}
 
       <div className={styling.grid} style={gridStyle}>
         {/* Render Header Row */}
         <div className={styling.cornerCell}>
            <AddEventButton onClick={() => {
                setModalInitialState(null); // Reset to defaults for generic add
+               setSelectedEvent(null);
                setIsModalOpen(true);
            }} />
         </div>
@@ -172,7 +221,8 @@ export function TimeGrid({
                          time={formatHour(startH) + " - " + formatHour(endH)}
                          onClick={(e) => {
                            e.stopPropagation();
-                           console.log("Clicked event", event);
+                           setSelectedEvent(event);
+                           setIsModalOpen(true);
                          }}
                        />
                      );
