@@ -6,7 +6,7 @@ interface AddEventButtonProps {
   onClick?: () => void;
 }
 
-export const AddEventButton: React.FC<AddEventButtonProps> = ({ onClick }) => {
+export function AddEventButton({ onClick }: AddEventButtonProps) {
   return (
     <button 
       className={styles.addButton} 

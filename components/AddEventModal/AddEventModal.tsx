@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import styling from "./AddEventModal.module.css";
+import { TimeSelect } from "../TimeSelect";
 
 interface AddEventModalProps {
   isOpen: boolean;
@@ -14,12 +15,12 @@ interface AddEventModalProps {
   days: string[];
 }
 
-export const AddEventModal: React.FC<AddEventModalProps> = ({
+export function AddEventModal({
   isOpen,
   onClose,
   onSave,
   days,
-}) => {
+}: AddEventModalProps) {
   const [title, setTitle] = useState("");
   const [day, setDay] = useState(days[0]);
   const [startTime, setStartTime] = useState("09:00");
@@ -75,23 +76,17 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({
           <div className={styling.row}>
             <div className={styling.formGroup} style={{ flex: 1 }}>
               <label className={styling.label}>Start Time</label>
-              <input
-                type="time"
-                className={styling.input}
+              <TimeSelect
                 value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                required
+                onChange={setStartTime}
               />
             </div>
 
             <div className={styling.formGroup} style={{ flex: 1 }}>
               <label className={styling.label}>End Time</label>
-              <input
-                type="time"
-                className={styling.input}
+              <TimeSelect
                 value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                required
+                onChange={setEndTime}
               />
             </div>
           </div>
