@@ -119,6 +119,7 @@
   /* Match timeLabel height */
   transition: background-color 0.15s ease;
   cursor: pointer;
+  overflow: visible;
 }
 
 .cell:hover {
