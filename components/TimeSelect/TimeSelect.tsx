@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
+import { START_HOUR, END_HOUR } from "@/utils/constants";
 import styles from "./TimeSelect.module.css";
 
 interface TimeSelectProps {
@@ -91,7 +92,11 @@ export function TimeSelect({ value, onChange }: TimeSelectProps) {
             key={slot.val} 
             className={`${styles.option} ${slot.val === value ? styles.selected : ""}`}
             onMouseDown={(e) => {
-                e.preventDefault(); // Prevent input blur before click fires
+                // Prevent input blur so we don't trigger handleBlur logic prematurely
+                e.preventDefault();
+            }}
+            onClick={(e) => {
+                e.stopPropagation(); // Prevent click from bubbling to modal/forms
                 handleOptionClick(slot.val);
             }}
           >
@@ -173,13 +178,23 @@ function parseTime(input: string): string | null {
     return `${hStr}:${mStr}`;
 }
 
+
+
+// ... (existing imports)
+
 function generateTimeSlots() {
     const slots = [];
-    for (let i = 0; i < 24 * 2; i++) { // 30 min intervals
-        const totalMins = i * 30;
+    const startMins = START_HOUR * 60;
+    const endMins = END_HOUR * 60; // Strictly stop at 11:00 PM
+
+    for (let i = 0; i <= (endMins - startMins) / 30; i++) {
+        const totalMins = startMins + i * 30;
         const h = Math.floor(totalMins / 60);
         const m = totalMins % 60;
         
+        // Don't go past 24:00
+        if (h > 24 || (h === 24 && m > 0)) continue;
+
         const hStr = h < 10 ? `0${h}` : h;
         const mStr = m < 10 ? `0${m}` : m;
         const val = `${hStr}:${mStr}`;
