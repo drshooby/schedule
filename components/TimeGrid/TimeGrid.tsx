@@ -5,7 +5,7 @@ import { AddEventModal } from "@/components/AddEventModal/AddEventModal";
 import { AddEventButton } from "@/components/AddEventButton";
 import { EventCard } from "@/components/EventCard";
 import { Toast } from "@/components/Toast";
-import { START_HOUR, END_HOUR } from "@/utils/constants";
+import { START_HOUR, END_HOUR, PASTEL_COLORS } from "@/utils/constants";
 
 interface TimeGridProps {
   days?: string[];
@@ -22,14 +22,7 @@ interface CalendarEvent {
   color: string;
 }
 
-const PASTEL_COLORS = [
-  "#E3F2FD", // Blue
-  "#E8F5E9", // Green
-  "#F3E5F5", // Purple
-  "#FFF3E0", // Orange
-  "#FCE4EC", // Pink
-  "#FAFAFA", // Gray
-];
+
 
 
 
@@ -78,7 +71,7 @@ export function TimeGrid({
         setEvents(prev => prev.map(e => e.id === selectedEvent.id ? {
             ...e,
             ...newEventData
-            // Keep original color
+            // Color is now passed in newEventData
         } : e));
         setSelectedEvent(null);
     } else {
@@ -89,7 +82,7 @@ export function TimeGrid({
             day: newEventData.day,
             startTime: newEventData.startTime,
             endTime: newEventData.endTime,
-            color: PASTEL_COLORS[Math.floor(Math.random() * PASTEL_COLORS.length)],
+            color: newEventData.color, // Use the color passed from modal
         };
         setEvents((prev) => [...prev, newEvent]);
     }
@@ -152,6 +145,7 @@ export function TimeGrid({
         initialStartTime={selectedEvent ? selectedEvent.startTime : modalInitialState?.startTime}
         initialEndTime={selectedEvent ? selectedEvent.endTime : modalInitialState?.endTime}
         initialTitle={selectedEvent ? selectedEvent.title : ""}
+        initialColor={selectedEvent ? selectedEvent.color : PASTEL_COLORS[Math.floor(Math.random() * PASTEL_COLORS.length)]}
       />
       
       {toast && (

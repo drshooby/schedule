@@ -13,12 +13,14 @@ interface AddEventModalProps {
     day: string;
     startTime: string;
     endTime: string;
+    color: string;
   }) => void;
   days: string[];
   initialDay?: string;
   initialStartTime?: string;
   initialEndTime?: string;
   initialTitle?: string;
+  initialColor?: string;
   onDelete?: () => void;
 }
 
@@ -31,12 +33,14 @@ export function AddEventModal({
   initialStartTime,
   initialEndTime,
   initialTitle,
+  initialColor,
   onDelete,
 }: AddEventModalProps) {
   const [title, setTitle] = useState("");
   const [day, setDay] = useState(days[0]);
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
+  const [color, setColor] = useState("#E3F2FD"); // Default blue-ish
   const [error, setError] = useState<string | null>(null);
 
   React.useEffect(() => {
@@ -45,9 +49,10 @@ export function AddEventModal({
       setStartTime(initialStartTime || "09:00");
       setEndTime(initialEndTime || "10:00");
       setTitle(initialTitle || "");
+      setColor(initialColor || "#E3F2FD");
       setError(null);
     }
-  }, [isOpen, initialDay, initialStartTime, initialEndTime, initialTitle, days]);
+  }, [isOpen, initialDay, initialStartTime, initialEndTime, initialTitle, initialColor, days]);
 
   if (!isOpen) return null;
 
@@ -78,7 +83,7 @@ export function AddEventModal({
         return;
     }
 
-    onSave({ title, day, startTime, endTime });
+    onSave({ title, day, startTime, endTime, color });
     onClose();
     // Reset form
     setTitle("");
@@ -136,6 +141,23 @@ export function AddEventModal({
                 value={endTime}
                 onChange={setEndTime}
               />
+            </div>
+          </div>
+
+          <div className={styling.formGroup}>
+            <label className={styling.label}>Color</label>
+            <div className={styling.colorInputWrapper}>
+                <div className={styling.colorPreview} style={{ backgroundColor: color }}>
+                    <input 
+                        type="color" 
+                        value={color}
+                        onChange={(e) => setColor(e.target.value)}
+                        className={styling.colorInput}
+                    />
+                </div>
+                <span style={{ fontSize: '0.9rem', color: '#666', fontWeight: 500 }}>
+                    {color.toUpperCase()}
+                </span>
             </div>
           </div>
 

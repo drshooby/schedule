@@ -89,7 +89,7 @@
 .actions {
   display: flex;
   gap: 12px;
-  margin-top: 32px;
+  margin-top: 0px;
   justify-content: flex-end;
   /* If remove button is present, justify-content might need to be 'space-between' or handled via margin-right: auto on the button */
 }
@@ -140,4 +140,37 @@
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(255, 68, 68, 0.2);
+}
+
+.colorInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.colorPreview {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid #eee;
+  transition: transform 0.2s, border-color 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.colorPreview:hover {
+  transform: scale(1.05);
+  border-color: #ddd;
+}
+
+.colorInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
