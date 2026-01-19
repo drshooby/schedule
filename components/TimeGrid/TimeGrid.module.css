@@ -1,0 +1,167 @@
+/* TimeGrid.module.css */
+
+/* Main wrapper with fixed height for scrolling */
+.container {
+  display: flex;
+  flex-direction: column;
+  /* Fill available space with a small gap */
+  width: calc(100% - 32px);
+  height: calc(100vh - 32px);
+  margin: 16px;
+
+  border: 1px solid #E5E5E5;
+  border-radius: 12px;
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  /* Slightly lifted */
+  overflow: hidden;
+  /* Hide outer scroll, inner grid handles it */
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.grid {
+  display: grid;
+  /* Time col is fixed width, Days take remaining space equally */
+  grid-template-columns: 80px repeat(var(--day-count), minmax(140px, 1fr));
+  width: 100%;
+  overflow: auto;
+  /* Enable scrolling */
+  position: relative;
+  /* Hide scrollbars for cleaner UI but allow scroll */
+  scrollbar-width: thin;
+  scrollbar-color: #E5E5E5 transparent;
+}
+
+/* 
+ * Sticky Positioning Logic 
+ * We need z-indexes to layer them correctly:
+ * 1. Corner Cell (Top Left) -> z-index: 30 (Highest)
+ * 2. Header Cells (Top Row) -> z-index: 20
+ * 3. Time Labels (Left Col) -> z-index: 10
+ * 4. Content Cells        -> z-index: 0
+ */
+
+/* Empty Top-Left Corner */
+.cornerCell {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  background-color: #F8F9FA;
+  /* Slightly distinct background */
+  border-bottom: 1px solid #E5E5E5;
+  border-right: 1px solid #E5E5E5;
+
+  /* Layout for the add button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+/* Header Cells (Mon, Tue...) */
+.headerCell {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: #ffffff;
+  /* Sticky requires opaque bg */
+  backdrop-filter: blur(8px);
+  /* Frosted glass effect if supported */
+  padding: 16px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #111;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid #E5E5E5;
+  border-right: 1px solid transparent;
+  /* Cleaner vertical lines */
+}
+
+/* Add vertical dividers only between columns visually if needed */
+.headerCell:not(:last-child) {
+  border-right: 1px solid #F0F0F0;
+}
+
+/* Time Sidebar (8:00 AM...) */
+.timeLabel {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background-color: #ffffff;
+  padding: 0 16px;
+  display: flex;
+  align-items: flex-start;
+  /* Align text to top of slot */
+  justify-content: flex-end;
+  padding-top: 8px;
+  /* Slight offset from line */
+
+  color: #888;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  border-right: 1px solid #E5E5E5;
+  height: 80px;
+  /* Taller cells for modern feel */
+}
+
+/* The actual schedule slots */
+.cell {
+  position: relative;
+  background-color: #fff;
+  border-right: 1px solid #F5F5F5;
+  border-bottom: 1px solid #F5F5F5;
+  height: 80px;
+  /* Match timeLabel height */
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+
+.cell:hover {
+  background-color: #FAFAFA;
+}
+
+/* Dotted line at the half-hour mark (optional delight) */
+.cell::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  right: 4px;
+  border-top: 1px dotted #F0F0F0;
+  pointer-events: none;
+}
+
+/* Print optimizations */
+@media print {
+  .container {
+    height: auto;
+    overflow: visible;
+    border: none;
+    box-shadow: none;
+  }
+
+  .grid {
+    display: block;
+    /* Fallback for simple printing or keep grid if paper is wide enough */
+    overflow: visible;
+  }
+
+  .cornerCell,
+  .headerCell,
+  .timeLabel {
+    position: static;
+    /* No sticky on paper */
+    border-color: #000;
+  }
+
+  .cell {
+    border-color: #ccc;
+    height: 60px;
+    /* Smaller for print */
+  }
+}
