@@ -1,0 +1,25 @@
+/* components/ClearButton/ClearButton.module.css */
+.button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #444;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background: #fff0f0;
+  /* Slight red tint for destructive action */
+  color: #d32f2f;
+}
+
+.button svg {
+  opacity: 0.7;
+}
