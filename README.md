@@ -2,6 +2,10 @@
 
 An interactive weekly schedule planner built with Next.js and React.
 
+## Motivation
+
+I use Gemini for many tasks and enjoy it, but I've been hearing a lot about new "Agent IDEs" like Cursor and CLI tools like Claude Code. I wanted to try out the new Antigravity IDE from Google, and this schedule builder was something I've been meaning to make for a while—I couldn't find any online that I actually liked. This was the perfect opportunity to play with the tool and learn modern development with an AI copilot.
+
 ## Features
 
 - **Interactive Grid**: Click anywhere on the grid to create an event at that time slot.
