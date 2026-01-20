@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import styling from "./TimeGrid.module.css";
 import { AddEventModal } from "@/components/AddEventModal/AddEventModal";
 import { AddEventButton } from "@/components/AddEventButton";
+import { TopActions } from "@/components/TopActions";
 import { EventCard } from "@/components/EventCard";
 import { Toast } from "@/components/Toast";
 import { START_HOUR, END_HOUR, PASTEL_COLORS } from "@/utils/constants";
@@ -65,26 +66,78 @@ export function TimeGrid({
     "--day-count": days.length,
   } as React.CSSProperties;
 
-  const handleSaveEvent = (newEventData: any) => {
+  const handleSaveEvent = (newEventData: { title: string; days: string[]; startTime: string; endTime: string; color: string }) => {
     if (selectedEvent) {
         // Editing existing event
-        setEvents(prev => prev.map(e => e.id === selectedEvent.id ? {
-            ...e,
-            ...newEventData
-            // Color is now passed in newEventData
-        } : e));
+        // 1. Update the ORIGINAL event to the FIRST selected day (or keep its day if contained)
+        // 2. Create NEW events for any other days selected
+        
+        // Actually, simpler logic:
+        // Delete the old event specific ID, then create new events for ALL selected days?
+        // OR:
+        // Update the current event instance to the first day in list.
+        // Create copies for others.
+        // Let's do:
+        // - Update the current event to match properties.
+        // - If days changed, we might need to "move" it.
+        
+        // User said: "edit event... add days... create copies".
+        // Let's keep it robust:
+        // We will keep the ID for the *primary* edited event (so modal doesn't freak out if we were keeping it open, though we close it).
+        // Actually we close modal on save.
+        
+        // Let's just create N events and delete the old one?
+        // No, keep the old ID for at least one to be nice to React keys if possible, but not strictly necessary as we close modal.
+        
+        // Plan:
+        // 1. Remove the originally selected event (since we are replacing it with this new definition which might be multiple days).
+        // 2. Create new events for every day in `days`.
+        // Wait, if I just change the title of "Mon" event and I have "Mon" selected, I expect "Mon" event to update.
+        // If I have "Mon" event, and I select "Mon" and "Fri", I expect "Mon" to update and "Fri" to be created.
+        
+        const eventsToAdd: CalendarEvent[] = [];
+        const primaryDay = newEventData.days[0];
+        
+        // Update the existing ID for the primary day
+        eventsToAdd.push({
+             ...selectedEvent,
+             title: newEventData.title,
+             day: primaryDay, // Move to first selected day if changed
+             startTime: newEventData.startTime,
+             endTime: newEventData.endTime,
+             color: newEventData.color
+        });
+        
+        // Create new IDs for secondary days
+        for (let i = 1; i < newEventData.days.length; i++) {
+             eventsToAdd.push({
+                id: crypto.randomUUID(),
+                title: newEventData.title,
+                day: newEventData.days[i],
+                startTime: newEventData.startTime,
+                endTime: newEventData.endTime,
+                color: newEventData.color
+             });
+        }
+
+        setEvents(prev => {
+            // Remove the old event instance
+            const filtered = prev.filter(e => e.id !== selectedEvent.id);
+            return [...filtered, ...eventsToAdd];
+        });
+        
         setSelectedEvent(null);
     } else {
-        // Creating new event
-        const newEvent: CalendarEvent = {
+        // Creating new event(s)
+        const newEvents: CalendarEvent[] = newEventData.days.map(d => ({
             id: crypto.randomUUID(),
             title: newEventData.title,
-            day: newEventData.day,
+            day: d,
             startTime: newEventData.startTime,
             endTime: newEventData.endTime,
             color: newEventData.color, // Use the color passed from modal
-        };
-        setEvents((prev) => [...prev, newEvent]);
+        }));
+        setEvents((prev) => [...prev, ...newEvents]);
     }
   };
 
@@ -129,8 +182,52 @@ export function TimeGrid({
     setIsModalOpen(true);
   };
 
+  const handleSaveConfig = () => {
+    // Strip IDs for cleaner JSON export
+    const eventsToSave = events.map(({ id, ...rest }) => rest);
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ events: eventsToSave }, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "schedule.json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const handleLoadConfig = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        try {
+            const json = JSON.parse(event.target?.result as string);
+            if (json && Array.isArray(json.events)) {
+                // Ensure every event has an ID upon loading
+                const loadedEvents = json.events.map((e: any) => ({
+                    ...e,
+                    id: e.id || crypto.randomUUID()
+                }));
+                setEvents(loadedEvents);
+                setToast({ message: "Schedule loaded.", type: "success", duration: 2500 });
+            } else {
+                setToast({ message: "Invalid file format.", type: "error", duration: 4000 });
+            }
+        } catch (e) {
+            setToast({ message: "Error parsing file.", type: "error", duration: 4000 });
+        }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleClearEvents = () => {
+    setEvents([]);
+    setToast({ message: "All events cleared.", type: "success", duration: 2500 });
+  };
+
   return (
     <div className={styling.container}>
+      <div className={styling.toolbar}>
+        <TopActions onSave={handleSaveConfig} onLoad={handleLoadConfig} onClear={handleClearEvents} />
+      </div>
+
       {/* Modal Layer */}
       <AddEventModal 
         isOpen={isModalOpen} 
@@ -212,7 +309,7 @@ export function TimeGrid({
                          top={`${topPercent}%`}
                          height={`${heightPercent}%`}
                          color={event.color}
-                         time={formatHour(startH) + " - " + formatHour(endH)}
+                         time={`${formatTime12h(event.startTime)} - ${formatTime12h(event.endTime)}`}
                          onClick={(e) => {
                            e.stopPropagation();
                            setSelectedEvent(event);
@@ -231,7 +328,21 @@ export function TimeGrid({
   );
 };
 
-// Helper to format 13 -> 1:00 PM
+// Helper to format "13:30" -> "1:30 PM"
+const formatTime12h = (timeStr: string): string => {
+  const [hStr, mStr] = timeStr.split(":");
+  const h = parseInt(hStr, 10);
+  const m = mStr || "00";
+  
+  if (h === 24) return `12:${m} AM`;
+  if (h === 12) return `12:${m} PM`;
+  
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return `${hour12}:${m} ${ampm}`;
+};
+
+// Helper to format 13 -> 1:00 PM (for grid labels)
 const formatHour = (hour: number): string => {
   if (hour === 24) {
     return "12:00 AM";

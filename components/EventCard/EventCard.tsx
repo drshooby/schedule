@@ -32,6 +32,7 @@ export function EventCard({
         onClick?.(e);
       }}
       title={title}
+      data-event-card
     >
       {title}
       <br />

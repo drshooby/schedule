@@ -17,6 +17,23 @@
   overflow: hidden;
   /* Hide outer scroll, inner grid handles it */
   font-family: var(--font-geist-sans), sans-serif;
+  overflow: hidden;
+  /* Hide outer scroll, inner grid handles it */
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.toolbar {
+  display: flex;
+  padding: 12px 0 12px 16px;
+  /* Align with grid padding if needed */
+  background: white;
+  /* No border bottom to keep it clean, or maybe add it back? User liked "sitting above" */
+}
+
+@media print {
+  .toolbar {
+    display: none !important;
+  }
 }
 
 .grid {
@@ -122,7 +139,7 @@
   overflow: visible;
 }
 
-.cell:hover {
+.cell:not(:has([data-event-card]:hover)):hover {
   background-color: #FAFAFA;
 }
 
@@ -138,18 +155,38 @@
 }
 
 /* Print optimizations */
+@page {
+  size: landscape;
+  margin: 5mm;
+}
+
 @media print {
+
+  /* Force global scale down to fit everything */
+  body {
+    zoom: 0.975;
+    /* Magic number for 5am-11pm on A4/Letter Landscape */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   .container {
+    width: 100%;
     height: auto;
     overflow: visible;
     border: none;
     box-shadow: none;
+    margin: 0;
+    padding: 0;
   }
 
+
+
   .grid {
-    display: block;
-    /* Fallback for simple printing or keep grid if paper is wide enough */
+    display: grid;
+    /* Keep grid layout */
     overflow: visible;
+    width: 100%;
   }
 
   .cornerCell,
@@ -160,9 +197,28 @@
     border-color: #000;
   }
 
+  /* Compress vertical space significantly */
+  .timeLabel,
   .cell {
-    border-color: #ccc;
-    height: 60px;
-    /* Smaller for print */
+    height: 40px;
+    /* Reduced from 80px */
+    font-size: 0.8rem;
+  }
+
+  .timeLabel {
+    padding-top: 4px;
+    align-items: flex-start;
+  }
+
+  .headerCell {
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #eee !important;
+    /* Force gray header */
+  }
+
+  /* Hide scrollbars */
+  ::-webkit-scrollbar {
+    display: none;
   }
 }
