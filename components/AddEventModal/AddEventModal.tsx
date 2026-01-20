@@ -10,7 +10,7 @@ interface AddEventModalProps {
   onClose: () => void;
   onSave: (event: {
     title: string;
-    day: string;
+    days: string[]; // Changed from single day
     startTime: string;
     endTime: string;
     color: string;
@@ -37,7 +37,7 @@ export function AddEventModal({
   onDelete,
 }: AddEventModalProps) {
   const [title, setTitle] = useState("");
-  const [day, setDay] = useState(days[0]);
+  const [selectedDays, setSelectedDays] = useState<string[]>([days[0]]);
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
   const [color, setColor] = useState("#E3F2FD"); // Default blue-ish
@@ -45,7 +45,7 @@ export function AddEventModal({
 
   React.useEffect(() => {
     if (isOpen) {
-      setDay(initialDay || days[0]);
+      setSelectedDays(initialDay ? [initialDay] : [days[0]]);
       setStartTime(initialStartTime || "09:00");
       setEndTime(initialEndTime || "10:00");
       setTitle(initialTitle || "");
@@ -83,11 +83,26 @@ export function AddEventModal({
         return;
     }
 
-    onSave({ title, day, startTime, endTime, color });
+    if (selectedDays.length === 0) {
+        setError("Please select at least one day.");
+        return;
+    }
+
+    onSave({ title, days: selectedDays, startTime, endTime, color });
     onClose();
     // Reset form
     setTitle("");
-    setDay(days[0]);
+    setSelectedDays([days[0]]);
+  };
+
+  const toggleDay = (d: string) => {
+    if (selectedDays.includes(d)) {
+        // Prevent unselecting the last day? Or allow it but validate on save?
+        // Let's allow unselecting but validate on save.
+        setSelectedDays(prev => prev.filter(day => day !== d));
+    } else {
+        setSelectedDays(prev => [...prev, d]);
+    }
   };
 
   return (
@@ -112,18 +127,22 @@ export function AddEventModal({
           </div>
 
           <div className={styling.formGroup}>
-            <label className={styling.label}>Day</label>
-            <select
-              className={styling.select}
-              value={day}
-              onChange={(e) => setDay(e.target.value)}
-            >
-              {days.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
+            <label className={styling.label}>Days</label>
+            <div className={styling.dayPicker}>
+                {days.map((d) => {
+                    const isSelected = selectedDays.includes(d);
+                    return (
+                        <button
+                            key={d}
+                            type="button"
+                            className={`${styling.dayBtn} ${isSelected ? styling.dayBtnSelected : ''}`}
+                            onClick={() => toggleDay(d)}
+                        >
+                            {d}
+                        </button>
+                    );
+                })}
+            </div>
           </div>
 
           <div className={styling.row}>
