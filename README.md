@@ -32,4 +32,4 @@ An interactive weekly schedule planner built with Next.js and React.
 - `utils/`: Helper constants and functions.
 - `app/`: Next.js App Router pages.
 
-### Made using [Antigravity](https://antigravity.dev)
+### Made using [Antigravity](https://antigravity.google)
