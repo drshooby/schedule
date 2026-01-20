@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import styling from "./TimeGrid.module.css";
 import { AddEventModal } from "@/components/AddEventModal/AddEventModal";
 import { AddEventButton } from "@/components/AddEventButton";
@@ -8,12 +8,21 @@ import { EventCard } from "@/components/EventCard";
 import { Toast } from "@/components/Toast";
 import { START_HOUR, END_HOUR, PASTEL_COLORS } from "@/utils/constants";
 
+/**
+ * Props for the TimeGrid component.
+ */
 interface TimeGridProps {
+  /** list of days to display in the header (e.g. ["Mon", "Tue"]) */
   days?: string[];
-  startHour?: number; // e.g., 8 for 8:00 AM
-  endHour?: number; // e.g., 18 for 6:00 PM
+  /** Start hour of the grid (0-24) */
+  startHour?: number;
+  /** End hour of the grid (0-24) */
+  endHour?: number;
 }
 
+/**
+ * Represents a single event on the calendar.
+ */
 interface CalendarEvent {
   id: string;
   title: string;
@@ -35,6 +44,10 @@ interface TimeGridProps {
 
 // ... (CalendarEvent interface remains same)
 
+/**
+ * Main grid component for the weekly schedule.
+ * Handles event rendering, creation, updating, deletion, and persistence.
+ */
 export function TimeGrid({
   days = ["Mon", "Tue", "Wed", "Thu", "Fri"],
   startHour = START_HOUR,
@@ -270,7 +283,7 @@ export function TimeGrid({
         ))}
         {/* Render Grid Body */}
         {hours.map((hour) => (
-          <React.Fragment key={hour}>
+          <div key={hour} style={{ display: "contents" }}>
             {/* Time Label Column */}
             <div className={styling.timeLabel}>{formatHour(hour)}</div>
 
@@ -321,14 +334,16 @@ export function TimeGrid({
                 </div>
               );
             })}
-          </React.Fragment>
+          </div>
         ))}
       </div>
     </div>
   );
 };
 
-// Helper to format "13:30" -> "1:30 PM"
+/**
+ * Formats a "HH:mm" string into 12-hour format (e.g. "13:30" -> "1:30 PM").
+ */
 const formatTime12h = (timeStr: string): string => {
   const [hStr, mStr] = timeStr.split(":");
   const h = parseInt(hStr, 10);
@@ -342,7 +357,9 @@ const formatTime12h = (timeStr: string): string => {
   return `${hour12}:${m} ${ampm}`;
 };
 
-// Helper to format 13 -> 1:00 PM (for grid labels)
+/**
+ * Formats a simple number hour into a label (e.g. 13 -> "1:00 PM").
+ */
 const formatHour = (hour: number): string => {
   if (hour === 24) {
     return "12:00 AM";

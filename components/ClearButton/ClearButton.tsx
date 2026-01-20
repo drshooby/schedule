@@ -1,10 +1,12 @@
-import React from "react";
 import styles from "./ClearButton.module.css";
 
 interface ClearButtonProps {
   onClear: () => void;
 }
 
+/**
+ * Button to clear all events from the schedule.
+ */
 export function ClearButton({ onClear }: ClearButtonProps) {
   return (
     <button className={styles.button} onClick={onClear} title="Clear All Events">

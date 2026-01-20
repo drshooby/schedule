@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import { useEffect, CSSProperties } from "react";
 import styles from "./Toast.module.css";
 
 interface ToastProps {
@@ -9,6 +9,9 @@ interface ToastProps {
   onClose: () => void;
 }
 
+/**
+ * A notification toast component with a progress bar.
+ */
 export function Toast({ message, type = "error", duration = 4000, onClose }: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -19,7 +22,7 @@ export function Toast({ message, type = "error", duration = 4000, onClose }: Toa
 
   const style = {
     "--toast-duration": `${duration}ms`,
-  } as React.CSSProperties;
+  } as CSSProperties;
 
   return (
     <div className={styles.toast} onClick={onClose} style={style}>

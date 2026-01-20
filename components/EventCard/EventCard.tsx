@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import { MouseEvent } from "react";
 import styles from "./EventCard.module.css";
 
 interface EventCardProps {
@@ -8,9 +8,12 @@ interface EventCardProps {
   height: string; // percentage
   color: string;
   time: string;
-  onClick?: (e: React.MouseEvent) => void;
+  onClick?: (e: MouseEvent) => void;
 }
 
+/**
+ * Renders a single event block on the grid.
+ */
 export function EventCard({ 
   title, 
   top, 

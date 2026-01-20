@@ -1,10 +1,12 @@
-import React from "react";
 import styles from "./SaveButton.module.css";
 
 interface SaveButtonProps {
   onSave: () => void;
 }
 
+/**
+ * Button to trigger the save/download functionality.
+ */
 export function SaveButton({ onSave }: SaveButtonProps) {
   return (
     <button className={styles.button} onClick={onSave} title="Save Schedule">

@@ -1,10 +1,13 @@
-import React, { useRef } from "react";
+import { useRef, ChangeEvent } from "react";
 import styles from "./LoadButton.module.css";
 
 interface LoadButtonProps {
   onLoad: (file: File) => void;
 }
 
+/**
+ * Button that triggers a hidden file input to load a JSON schedule.
+ */
 export function LoadButton({ onLoad }: LoadButtonProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -12,7 +15,7 @@ export function LoadButton({ onLoad }: LoadButtonProps) {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       onLoad(file);

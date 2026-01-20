@@ -1,6 +1,8 @@
-import React from "react";
 import styles from "./PrintButton.module.css";
 
+/**
+ * Button that triggers the browser's native print dialog.
+ */
 export function PrintButton() {
   const handlePrint = () => {
     window.print();

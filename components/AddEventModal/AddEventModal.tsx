@@ -1,10 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import styling from "./AddEventModal.module.css";
 import { TimeSelect } from "../TimeSelect";
 import { Toast } from "../Toast";
 import { START_HOUR, END_HOUR } from "@/utils/constants";
 
+/**
+ * Props for the modal used to creating or editing events.
+ */
 interface AddEventModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -43,7 +46,10 @@ export function AddEventModal({
   const [color, setColor] = useState("#E3F2FD"); // Default blue-ish
   const [error, setError] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  /**
+   * Sync internal state with props when modal opens.
+   */
+  useEffect(() => {
     if (isOpen) {
       setSelectedDays(initialDay ? [initialDay] : [days[0]]);
       setStartTime(initialStartTime || "09:00");
@@ -56,7 +62,7 @@ export function AddEventModal({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     // Check if end > start

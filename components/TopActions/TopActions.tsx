@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./TopActions.module.css";
 import { SaveButton } from "@/components/SaveButton";
 import { LoadButton } from "@/components/LoadButton";
@@ -11,6 +10,9 @@ interface TopActionsProps {
   onClear: () => void;
 }
 
+/**
+ * Container for top-level action buttons (Save, Load, Clear, Print).
+ */
 export function TopActions({ onSave, onLoad, onClear }: TopActionsProps) {
   return (
     <div className={styles.container}>
